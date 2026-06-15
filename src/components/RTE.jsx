@@ -9,16 +9,16 @@ function RTE({ name, control, label, defaultValue = "" }) {
       <Controller
         name={name || "content"}
         control={control}
-        render={({ field: { onChange } }) => (
+        defaultValue={defaultValue}
+        render={({ field: { onChange, value } }) => (
           <Editor
             apiKey={conf.tinymceApiKey}
-            initialValue={defaultValue}
+            initialValue={value || defaultValue}
             onEditorChange={onChange}
             init={{
               height: 500,
               menubar: false,
 
-              // 🌙 Dark UI skin
               skin: "oxide-dark",
               content_css: "dark",
 
@@ -29,12 +29,10 @@ function RTE({ name, control, label, defaultValue = "" }) {
               ],
 
               toolbar:
-                "undo redo | formatselect | " +
-                "bold italic backcolor | alignleft aligncenter " +
-                "alignright alignjustify | bullist numlist outdent indent | " +
-                "removeformat | help",
+                "undo redo | formatselect | bold italic backcolor | " +
+                "alignleft aligncenter alignright alignjustify | " +
+                "bullist numlist outdent indent | removeformat | help",
 
-              // 🌓 optional override for content look
               content_style:
                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px; background-color:#1e1e1e; color:#eaeaea; }",
             }}
