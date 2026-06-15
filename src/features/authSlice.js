@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   // status -> is user already login?
-  status: true,
+  status: false,
   userData: null,
 };
 
