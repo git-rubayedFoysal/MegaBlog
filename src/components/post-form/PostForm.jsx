@@ -264,11 +264,7 @@ function PostForm({ post }) {
               {contentWordCount} words
             </span>
           </div>
-          <RTE
-            name="content"
-            control={control}
-            defaultValue={getValues("content")}
-          />
+          <RTE name="content" control={control} defaultValue="" />
           <p className="text-xs text-gray-500 mt-2">
             ✨ Use formatting, headings, and lists to make your content more
             readable
