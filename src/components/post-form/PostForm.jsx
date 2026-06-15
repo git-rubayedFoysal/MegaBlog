@@ -295,13 +295,15 @@ function PostForm({ post }) {
                 alt="Preview"
                 className="w-full h-40 object-cover rounded-lg mb-3"
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => setImagePreview(null)}
-                className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                bgColor="bg-transparent"
+                textColor="text-red-400"
+                className="text-sm p-0 hover:text-red-300 transition-colors"
               >
                 Change Image
-              </button>
+              </Button>
             </div>
           ) : null}
 
@@ -390,8 +392,8 @@ function PostForm({ post }) {
         <Button
           type="submit"
           disabled={isSubmitting}
-          bgColor={isSubmitting ? "bg-gray-600" : "bg-primary-600"}
-          className={`w-full btn-primary cursor-pointer py-3 font-semibold transition-all ${
+          bgColor={isSubmitting ? "bg-gray-600" : "bg-blue-600"}
+          className={`w-full cursor-pointer py-3 font-semibold transition-all ${
             isSubmitting ? "opacity-70" : "hover:shadow-glow"
           }`}
         >
