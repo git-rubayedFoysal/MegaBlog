@@ -29,7 +29,6 @@ function PostForm({ post }) {
     handleSubmit,
     setValue,
     control,
-    formState: { errors },
   } = useForm({
     defaultValues: {
       title: post?.title || "",

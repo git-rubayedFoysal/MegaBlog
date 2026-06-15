@@ -1,16 +1,83 @@
-# React + Vite
+# megaprojectRev
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + Vite blog application with Appwrite backend integration, Tailwind styling, Redux state management, and rich text editing.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 with Vite for fast development
+- Tailwind CSS for utility-first styling
+- Redux Toolkit for global auth state
+- Appwrite for authentication, database, and file storage
+- Rich text editor via TinyMCE
+- Image upload and drag-and-drop support
+- Responsive post creation and editing UI
 
-## React Compiler
+## Project setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Install dependencies:
 
-## Expanding the ESLint configuration
+```bash
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Run development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview build locally:
+
+```bash
+npm run preview
+```
+
+Lint project files:
+
+```bash
+npm run lint
+```
+
+## Environment variables
+
+Create a `.env` file in the project root with the following values:
+
+```env
+VITE_APPWRITE_URL=https://your-appwrite-endpoint
+VITE_APPWRITE_PROJECT_ID=your_project_id
+VITE_APPWRITE_DATABASE_ID=your_database_id
+VITE_APPWRITE_COLLECTION_ID=your_collection_id
+VITE_APPWRITE_BUCKET_ID=your_bucket_id
+VITE_TINYMCE_API_KEY=your_tinymce_api_key
+```
+
+> `src/config/conf.js` reads these values at runtime.
+
+## App structure
+
+- `src/main.jsx` — application entry point
+- `src/App.jsx` — top-level router and layout
+- `src/components/` — reusable UI components
+- `src/components/post-form/` — post creation/edit form
+- `src/appwrite/` — Appwrite authentication and service helpers
+- `src/features/` — Redux slice definitions
+- `src/pages/` — route pages like `Home`, `Login`, `Signup`, and `Post`
+- `src/config/conf.js` — environment-based Appwrite config
+
+## Notes
+
+- The app uses Appwrite document IDs for post slugs.
+- The image preview is generated from file upload or Appwrite storage.
+- Form handling is implemented with React Hook Form.
+
+## Recommended setup
+
+Use Node.js 18+ and a modern browser.
+
+If you want to customize the theme, update Tailwind classes in the component files or add utility classes in `src/index.css`.
