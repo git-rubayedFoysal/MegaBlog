@@ -24,7 +24,13 @@ function PostForm({ post }) {
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
-  const { register, handleSubmit, setValue, control } = useForm({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       title: post?.title || "",
       slug: post?.$id || "",
@@ -59,21 +65,15 @@ function PostForm({ post }) {
     setValue("slug", slugTransform(watchTitle || ""));
   }, [watchTitle, setValue, slugTransform]);
 
-  // ✅ FIXED IMAGE CHANGE (BUG FIX ONLY)
+  const imageRegister = register("image", { required: !post });
+
   const handleImageChange = (e) => {
-    const fileList = e.target.files;
-
-    if (fileList && fileList.length > 0) {
-      const files = Array.from(fileList); // FIX
-
-      setValue("image", files);
-
-      const file = files[0];
-
+    // Call RHF's own onChange first so it captures the FileList
+    imageRegister.onChange(e);
+    const file = e.target.files?.[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        setImagePreview(event.target?.result);
-      };
+      reader.onload = (event) => setImagePreview(event.target?.result);
       reader.readAsDataURL(file);
     }
   };
@@ -90,26 +90,19 @@ function PostForm({ post }) {
     }
   };
 
-  // ✅ DROP FIXED (BUG FIX ONLY)
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
     const files = e.dataTransfer.files;
-
     if (files && files.length > 0) {
-      const fileArray = Array.from(files); // FIX
-
-      setValue("image", fileArray);
-
-      const file = fileArray[0];
-
+      // Manually set value since drag-drop bypasses the input onChange
+      setValue("image", files, { shouldValidate: true });
+      const file = files[0];
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = (event) => {
-          setImagePreview(event.target?.result);
-        };
+        reader.onload = (event) => setImagePreview(event.target?.result);
         reader.readAsDataURL(file);
       }
     }
@@ -123,15 +116,35 @@ function PostForm({ post }) {
     try {
       const { title, content, slug, status } = data;
 
-      const safeSlug = sanitizeSlug(slug);
+      console.log("[PostForm] submit data:", {
+        title,
+        slug,
+        status,
+        image: data.image,
+        userId: userData?.$id,
+      });
 
-      if (!safeSlug) throw new Error("Invalid slug");
+      const safeSlug = sanitizeSlug(slug);
+      if (!safeSlug) throw new Error("Invalid slug — title may be empty");
 
       setValue("slug", safeSlug);
 
-      const file = data.image?.[0]
-        ? await appwriteService.uploadFile(data.image[0])
+      if (!userData?.$id) throw new Error("Not logged in — userId is missing");
+
+      // data.image can be FileList or Array depending on input method
+      const imageFile =
+        data.image instanceof FileList
+          ? data.image[0]
+          : Array.isArray(data.image)
+            ? data.image[0]
+            : null;
+
+      console.log("[PostForm] imageFile:", imageFile);
+
+      const file = imageFile
+        ? await appwriteService.uploadFile(imageFile)
         : null;
+      console.log("[PostForm] uploaded file:", file);
 
       if (post) {
         if (file) {
@@ -279,7 +292,7 @@ function PostForm({ post }) {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                {...register("image", { required: !post })}
+                {...imageRegister}
                 onChange={handleImageChange}
               />
               <div className="flex flex-col items-center justify-center gap-3">
