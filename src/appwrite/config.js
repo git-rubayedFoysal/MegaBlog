@@ -41,7 +41,7 @@ export class Services {
   }
 
   // update post
-  async updatePost(slug, { title, content, featureImage, status }) {
+  async updatePost(slug, { title, content, featuredImage, status }) {
     try {
       return await this.database.updateDocument(
         conf.appwriteDatabaseId,
@@ -50,7 +50,7 @@ export class Services {
         {
           title,
           content,
-          featureImage,
+          featuredImage,
           status,
         },
       );
@@ -90,7 +90,7 @@ export class Services {
   }
 
   // list post
-  async listPosts(queries = [Query.equal(status, "active")]) {
+  async listPosts(queries = [Query.equal("status", "active")]) {
     try {
       return this.database.listDocuments(
         conf.appwriteDatabaseId,
@@ -116,8 +116,8 @@ export class Services {
   }
 
   //get file preview
-  async getFilePreview(fileId) {
-    return this.bucket.getFilePreview(conf.appwriteBucketId, fileId).toString();
+  getFilePreview(fileId) {
+    return this.bucket.getFileView(conf.appwriteBucketId, fileId).toString();
   }
 
   //delete file

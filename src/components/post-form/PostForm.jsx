@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Select, Input, RTE } from "../index";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router";
@@ -16,6 +16,8 @@ function PostForm({ post }) {
       .replace(/^-+|-+$/g, "");
   }, []);
 
+  const [submitError, setSubmitError] = useState("");
+
   const { register, handleSubmit, watch, setValue, getValues, control } =
     useForm({
       defaultValues: {
@@ -29,6 +31,7 @@ function PostForm({ post }) {
   const userData = useSelector((state) => state.auth.userData);
 
   const submit = async (data) => {
+    setSubmitError("");
     try {
       const { title, content, slug, status } = data;
       const safeSlug = sanitizeSlug(slug);
@@ -86,6 +89,9 @@ function PostForm({ post }) {
       }
     } catch (error) {
       console.error("PostForm submit error:", error);
+      setSubmitError(
+        error?.message || "Something went wrong. Please try again.",
+      );
     }
   };
 
@@ -116,6 +122,13 @@ function PostForm({ post }) {
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
+      {submitError && (
+        <div className="w-full px-2 mb-4">
+          <p className="text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2 text-sm">
+            {submitError}
+          </p>
+        </div>
+      )}
       <div className="w-2/3 px-2">
         <Input
           label="Title: "
