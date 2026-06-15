@@ -3,7 +3,7 @@ import { Button, Select, Input, RTE } from "../index";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 function PostForm({ post }) {
   const sanitizeSlug = useCallback((value) => {
@@ -20,13 +20,11 @@ function PostForm({ post }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [dragActive, setDragActive] = useState(false);
-  const [titleCount, setTitleCount] = useState(post?.title?.length || 0);
-  const [contentWordCount, setContentWordCount] = useState(0);
 
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
-  const { register, handleSubmit, watch, setValue, control } = useForm({
+  const { register, handleSubmit, setValue, control } = useForm({
     defaultValues: {
       title: post?.title || "",
       slug: post?.$id || "",
@@ -36,22 +34,15 @@ function PostForm({ post }) {
     },
   });
 
-  const watchTitle = watch("title");
-  const watchContent = watch("content");
+  const watchTitle = useWatch({ control, name: "title" });
+  const watchContent = useWatch({ control, name: "content" });
 
-  // Title count
-  useEffect(() => {
-    setTitleCount(watchTitle?.length || 0);
-  }, [watchTitle]);
-
-  // Word count (FIXED SAFETY)
-  useEffect(() => {
-    const plainText = (watchContent || "").replace(/<[^>]*>/g, "");
-
-    const wordCount = plainText.trim().split(/\s+/).filter(Boolean).length;
-
-    setContentWordCount(wordCount);
-  }, [watchContent]);
+  const titleCount = watchTitle?.length || 0;
+  const contentWordCount = (watchContent || "")
+    .replace(/<[^>]*>/g, "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
 
   // Slug auto update
   const slugTransform = useCallback((value) => {
@@ -65,14 +56,8 @@ function PostForm({ post }) {
   }, []);
 
   useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      if (name === "title") {
-        setValue("slug", slugTransform(value.title || ""));
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [watch, setValue, slugTransform]);
+    setValue("slug", slugTransform(watchTitle || ""));
+  }, [watchTitle, setValue, slugTransform]);
 
   // ✅ FIXED IMAGE CHANGE (BUG FIX ONLY)
   const handleImageChange = (e) => {
@@ -183,53 +168,194 @@ function PostForm({ post }) {
     }
   };
 
+  const isEditing = Boolean(post);
+
   return (
-    <form
-      onSubmit={handleSubmit(submit)}
-      className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-    >
-      {/* ERROR */}
+    <form onSubmit={handleSubmit(submit)} className="space-y-8">
       {submitError && (
-        <div className="col-span-full p-4 bg-red-500/10 border border-red-500/50 rounded">
+        <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
           {submitError}
         </div>
       )}
 
-      {/* LEFT */}
-      <div className="lg:col-span-2 space-y-6">
-        <Input placeholder="Title" {...register("title", { required: true })} />
+      <div className="grid grid-cols-1 xl:grid-cols-[1.8fr_1fr] gap-8">
+        <section className="rounded-4xl border border-slate-800/80 bg-slate-950/80 p-8 shadow-2xl shadow-slate-950/20">
+          <div className="mb-8 flex flex-col gap-3">
+            <div>
+              <p className="text-sm uppercase tracking-[0.24em] text-blue-400">
+                Post details
+              </p>
+              <h2 className="mt-2 text-3xl font-semibold text-white">
+                {isEditing ? "Edit post" : "Create a new post"}
+              </h2>
+            </div>
+            <p className="max-w-2xl text-sm text-slate-400">
+              Write a strong title, choose a memorable slug, and add rich
+              content with the editor below.
+            </p>
+          </div>
 
-        <Input placeholder="Slug" {...register("slug", { required: true })} />
+          <div className="grid gap-6">
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-slate-200">
+                Post title
+              </label>
+              <Input
+                placeholder="Write a compelling title"
+                {...register("title", { required: true })}
+              />
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>{titleCount} / 70 characters</span>
+                <span
+                  className={
+                    titleCount > 70 ? "text-red-400" : "text-slate-500"
+                  }
+                >
+                  {titleCount > 70 ? "Too long" : "Keep it concise"}
+                </span>
+              </div>
+            </div>
 
-        <RTE name="content" control={control} />
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-slate-200">
+                URL slug
+              </label>
+              <Input
+                placeholder="your-post-slug"
+                {...register("slug", { required: true })}
+              />
+              <p className="text-xs text-slate-500">
+                This is used to create the post URL. It updates automatically
+                from the title.
+              </p>
+            </div>
 
-        <p className="text-sm text-gray-400">{contentWordCount} words</p>
-      </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-semibold text-slate-200">
+                  Post content
+                </label>
+                <span className="text-xs text-slate-500">
+                  {contentWordCount} words
+                </span>
+              </div>
+              <div className="rounded-3xl border border-slate-800/70 bg-slate-900/90 p-2">
+                <RTE name="content" control={control} />
+              </div>
+            </div>
+          </div>
+        </section>
 
-      {/* RIGHT */}
-      <div className="space-y-4">
-        <div
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-          className="border p-4 rounded"
-        >
-          <input
-            type="file"
-            accept="image/*"
-            {...register("image", { required: !post })}
-            onChange={handleImageChange}
-          />
+        <aside className="space-y-6">
+          <section className="rounded-4xl border border-slate-800/80 bg-slate-950/80 p-6 shadow-2xl shadow-slate-950/20">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-blue-400">
+                  Media
+                </p>
+                <h3 className="text-xl font-semibold text-white">
+                  Featured image
+                </h3>
+              </div>
+              <span className="rounded-full bg-blue-600/15 px-3 py-1 text-xs text-blue-200">
+                {isEditing ? "Update" : "Upload"}
+              </span>
+            </div>
 
-          {imagePreview && <img src={imagePreview} className="mt-2 rounded" />}
-        </div>
+            <label
+              htmlFor="post-image"
+              className={`group block cursor-pointer rounded-3xl border-2 border-dashed p-6 text-center transition-all ${
+                dragActive
+                  ? "border-blue-400/80 bg-blue-500/10"
+                  : "border-slate-700 bg-slate-900/80"
+              }`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              <input
+                id="post-image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                {...register("image", { required: !post })}
+                onChange={handleImageChange}
+              />
+              <div className="flex flex-col items-center justify-center gap-3">
+                <span className="text-3xl text-blue-300">📷</span>
+                <p className="text-sm font-semibold text-slate-100">
+                  Drag & drop an image or click to browse
+                </p>
+                <p className="text-xs text-slate-500">
+                  PNG, JPG, GIF, WEBP up to 10MB
+                </p>
+              </div>
+            </label>
 
-        <Select options={["active", "inactive"]} {...register("status")} />
+            {imagePreview && (
+              <div className="mt-4 overflow-hidden rounded-3xl border border-slate-700 bg-slate-950">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="h-56 w-full object-cover"
+                />
+              </div>
+            )}
+          </section>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Publishing..." : "Publish"}
-        </Button>
+          <section className="rounded-4xl border border-slate-800/80 bg-slate-950/80 p-6 shadow-2xl shadow-slate-950/20">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-blue-400">
+                  Settings
+                </p>
+                <h3 className="text-xl font-semibold text-white">
+                  Publication
+                </h3>
+              </div>
+              <span className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-400">
+                Status
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-200 mb-2">
+                  Post status
+                </label>
+                <Select
+                  options={["active", "inactive"]}
+                  {...register("status")}
+                />
+              </div>
+
+              <div className="rounded-3xl border border-slate-800/70 bg-slate-900/90 p-4">
+                <p className="text-sm text-slate-400">Ready to publish?</p>
+                <p className="text-xs text-slate-500 mt-2">
+                  When published, your post will be visible to all users
+                  immediately.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div className="rounded-4xl border border-slate-800/80 bg-slate-950/80 p-6 shadow-2xl shadow-slate-950/20">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              bgColor={isSubmitting ? "bg-slate-600" : "bg-blue-600"}
+              textColor="text-white"
+              className="w-full py-4 text-base font-semibold"
+            >
+              {isSubmitting
+                ? "Publishing..."
+                : isEditing
+                  ? "Update Post"
+                  : "Publish Post"}
+            </Button>
+          </div>
+        </aside>
       </div>
     </form>
   );
