@@ -6,13 +6,16 @@ function Select({ options, label, className = "", ...props }, ref) {
   return (
     <div className="w-full text-left">
       {label && (
-        <label className="inline-block mb-1 pl-1 font-bold" htmlFor={id}>
+        <label
+          className="inline-block mb-2 pl-1 font-semibold text-gray-300"
+          htmlFor={id}
+        >
           {label}
         </label>
       )}
       <select
         id={id}
-        className={`${className} px-3 py-2.5 rounded bg-[#333] text-white outline-none duration-200 border-3 border-[#3e3e3e] w-full focus:bg-[#1a1a1a]`}
+        className={`${className} input-base cursor-pointer`}
         ref={ref}
         {...props}
       >

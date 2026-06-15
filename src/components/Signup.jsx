@@ -27,40 +27,46 @@ function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full">
-      <div className="mx-auto w-full max-w-lg bg-[#2a2a2a] rounded-xl p-10 border-2 border-[#3e3e3e]">
-        <div className="mb-2 flex justify-center">
-          <span className="inline-block w-full max-w-25">
+    <div className="flex items-center justify-center w-full min-h-screen px-4">
+      <div className="w-full max-w-md card">
+        <div className="mb-6 flex justify-center">
+          <span className="inline-block w-full max-w-xs">
             <Logo width="100%" />
           </span>
         </div>
-        <h2 className="text-center text-2xl font-bold leading-tight">
-          Sign in to your account
-        </h2>
-        <p className="mt-2 text-center text-base text-whitw/90">
+
+        <h1 className="text-center text-3xl font-bold text-white mb-2">
+          Create Account
+        </h1>
+        <p className="mt-2 text-center text-gray-400">
           Already have an account?&nbsp;
           <Link
             to="/login"
-            className="font-medium text-primary transition-all duration-200 hover:underline"
+            className="font-semibold text-primary-400 hover:text-primary-300 transition-colors duration-200"
           >
             Sign In
           </Link>
         </p>
 
         {error && (
-          <p className="text-red-600 mt-8 text-center">{error.message}</p>
+          <div className="mt-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm text-center">
+              {error.message || error}
+            </p>
+          </div>
         )}
+
         <form onSubmit={handleSubmit(create)} className="mt-8">
           <div className="space-y-5">
             <Input
-              label="Full Name: "
-              placeholder="Enter your full name."
+              label="Full Name"
+              placeholder="John Doe"
               type="text"
               {...register("name", { required: true })}
             />
             <Input
-              label="Email: "
-              placeholder="Enter your email"
+              label="Email"
+              placeholder="you@example.com"
               type="email"
               {...register("email", {
                 required: true,
@@ -73,13 +79,13 @@ function Signup() {
             />
 
             <Input
-              label="Password: "
-              placeholder="Enter your password"
+              label="Password"
+              placeholder="••••••••"
               type="password"
               {...register("password", { required: true })}
             />
 
-            <Button type="submit" className="w-full cursor-pointer">
+            <Button type="submit" className="w-full btn-primary cursor-pointer">
               Create Account
             </Button>
           </div>

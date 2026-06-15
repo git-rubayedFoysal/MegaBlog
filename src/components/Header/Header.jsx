@@ -35,20 +35,20 @@ function Header() {
   ];
 
   return (
-    <header className="py-3 shadow bg-[#1a1a1a]">
-      <nav className="flex justify-between items-center px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-dark-700 bg-dark-900/95 backdrop-blur supports-backdrop-filter:bg-dark-900/60 shadow-lg">
+      <nav className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
         <div>
-          <Link to="/">
+          <Link to="/" className="hover:opacity-80 transition-opacity">
             <Logo width="70px" />
           </Link>
         </div>
         <div className="ml-auto">
-          <ul className="flex gap-3 items-center">
+          <ul className="flex gap-6 items-center">
             {navItem.map((item) =>
               item.active ? (
                 <li key={item.name}>
                   <button
-                    className="inline-bock px-1.5 py-1 duration-200 hover:bg-[#2e2e2e] cursor-pointer rounded"
+                    className="px-4 py-2 text-sm font-medium text-white rounded-lg hover:bg-dark-700 hover:text-primary-400 transition-all duration-200 cursor-pointer"
                     onClick={() => navigate(item.slug)}
                   >
                     {item.name}

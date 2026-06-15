@@ -16,22 +16,21 @@ function Home() {
   }, []);
 
   return posts.length === 0 ? (
-    <div className="w-full py-8 text-center">
-      <div className="flex flex-wrap">
-        <div className="w-full p-2">
-          <h1 className="text-2xl font-bold hover:text-gray-500">
-            Login to see posts or create a new one.
-          </h1>
-        </div>
+    <div className="w-full py-16 text-center">
+      <div className="flex justify-center mb-6">
+        <div className="text-6xl">📝</div>
       </div>
+      <h1 className="text-3xl font-bold text-white mb-2">No Posts Yet</h1>
+      <p className="text-gray-400 text-lg">
+        Login to see posts or create a new one.
+      </p>
     </div>
   ) : (
     <div className="w-full py-8">
-      <div className="flex flex-wrap">
+      <h1 className="text-3xl font-bold text-white mb-8">Recent Posts</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {posts.map((post) => (
-          <div key={post.$id} className="p-2 w-1/4">
-            <PostCard {...post} />
-          </div>
+          <PostCard key={post.$id} {...post} />
         ))}
       </div>
     </div>

@@ -25,10 +25,18 @@ function EditPost() {
   }, [navigate, slug]);
 
   return post ? (
-    <div className="py-8">
+    <div className="py-12">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-white">Edit Post</h1>
+        <p className="text-gray-400 mt-2">Update your post content</p>
+      </div>
       <PostForm post={post} />
     </div>
-  ) : null;
+  ) : (
+    <div className="text-center py-16">
+      <p className="text-gray-400">Loading...</p>
+    </div>
+  );
 }
 
 export default EditPost;

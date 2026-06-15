@@ -37,32 +37,43 @@ function Post() {
   };
 
   return post ? (
-    <div className="py-8">
-      <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
-        <img
-          src={appwriteService.getFilePreview(post.featuredImage)}
-          alt={post.title}
-          className="rounded-xl"
-        />
+    <div className="py-12">
+      <div className="w-full mb-8 relative">
+        <div className="overflow-hidden rounded-2xl shadow-2xl mb-6">
+          <img
+            src={appwriteService.getFilePreview(post.featuredImage)}
+            alt={post.title}
+            className="w-full h-96 object-cover"
+          />
+        </div>
 
         {isAuthor && (
-          <div className="absolute right-6 top-6">
+          <div className="flex justify-end gap-4 mb-6">
             <Link to={`/edit-post/${post.$id}`}>
-              <Button bgColor="bg-green-500" className="mr-3">
-                Edit
+              <Button bgColor="bg-primary-600" className="hover:bg-primary-700">
+                ✏️ Edit
               </Button>
             </Link>
-            <Button bgColor="bg-red-500" onClick={deletePost}>
-              Delete
+            <Button
+              bgColor="bg-red-600"
+              onClick={deletePost}
+              className="hover:bg-red-700"
+            >
+              🗑️ Delete
             </Button>
           </div>
         )}
       </div>
-      <div className="w-full mb-6">
-        <h1 className="text-2xl font-bold">{post.title}</h1>
+      <div className="w-full mb-8">
+        <h1 className="text-4xl font-bold text-white mb-4">{post.title}</h1>
+        <p className="text-gray-400">By {userData?.name || "Anonymous"}</p>
       </div>
-      <div className="browser-css">{parse(post.content)}</div>
+      <div className="prose prose-invert max-w-none">{parse(post.content)}</div>
     </div>
-  ) : null;
+  ) : (
+    <div className="text-center py-16">
+      <p className="text-gray-400">Loading...</p>
+    </div>
+  );
 }
 export default Post;

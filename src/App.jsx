@@ -10,22 +10,32 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    authService
-      .getCurrentUser()
-      .then((userData) => {
-        if (userData) {
-          dispatch(login(userData));
+    async function getUserData() {
+      try {
+        const user = await authService.getCurrentUser();
+
+        if (user) {
+          dispatch(login(user));
         } else {
           dispatch(logout());
         }
-      })
-      .finally(() => setLoading(false));
+      } catch (error) {
+        console.error("getUserData error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getUserData();
   }, [dispatch]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-dark-950">
+        <div className="text-center">
+          <div className="mb-4 text-4xl">⏳</div>
+          <p className="text-gray-400 text-lg">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -33,7 +43,7 @@ function App() {
   return (
     <Container>
       <Header />
-      <main className="min-h-[55vh] w-full block">
+      <main className="grow w-full">
         <Outlet />
       </main>
       <Footer />
