@@ -50,7 +50,7 @@ function Post() {
         {isAuthor && (
           <div className="flex justify-end gap-4 mb-6">
             <Link to={`/edit-post/${post.$id}`}>
-              <Button bgColor="bg-primary-600" className="hover:bg-primary-700">
+              <Button bgColor="bg-blue-600" className="hover:bg-blue-700">
                 ✏️ Edit
               </Button>
             </Link>
