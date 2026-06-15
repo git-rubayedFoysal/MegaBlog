@@ -23,15 +23,14 @@ function PostForm({ post }) {
   const [titleCount, setTitleCount] = useState(post?.title?.length || 0);
   const [contentWordCount, setContentWordCount] = useState(0);
 
-  const { register, handleSubmit, watch, setValue, getValues, control } =
-    useForm({
-      defaultValues: {
-        title: post?.title || "",
-        slug: post?.$id || "",
-        content: post?.content || "",
-        status: post?.status || "active",
-      },
-    });
+  const { register, handleSubmit, watch, setValue, control } = useForm({
+    defaultValues: {
+      title: post?.title || "",
+      slug: post?.$id || "",
+      content: post?.content || "",
+      status: post?.status || "active",
+    },
+  });
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
   const watchTitle = watch("title");
@@ -264,7 +263,7 @@ function PostForm({ post }) {
               {contentWordCount} words
             </span>
           </div>
-          <RTE name="content" control={control} defaultValue="" />
+          <RTE name="content" control={control} />
           <p className="text-xs text-gray-500 mt-2">
             ✨ Use formatting, headings, and lists to make your content more
             readable
